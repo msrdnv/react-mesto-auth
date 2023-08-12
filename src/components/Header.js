@@ -1,10 +1,9 @@
 import logoMestoWhite from '../images/logo-mesto-white.svg';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function Header({loggedIn, email, onSignOut}) {
 
   const location = useLocation();
-  const navigate = useNavigate();
 
   return (
     <header className="header">

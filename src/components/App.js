@@ -12,6 +12,7 @@ import Login from './Login.js';
 import Register from './Register.js';
 import ProtectedRoute from './ProtectedRoute.js';
 import { api } from '../utils/api.js';
+import { authApi } from '../utils/auth.js';
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
 
 export default function App() {
@@ -36,6 +37,16 @@ export default function App() {
     })
     .catch(console.error);
   }, []);
+
+  React.useEffect(() => {
+    const token = localStorage.getItem('token');
+    authApi.checkToken(token)
+    .then(({data}) => {
+      //console.log(data);
+      setEmail(data.email);
+    })
+    .catch(console.error)
+  }, [loggedIn]);
 
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(true);
@@ -101,9 +112,25 @@ export default function App() {
     .catch(console.error)
   }
 
-  function handleLoggedIn() {
-    setLoggedIn(true);
-    navigate('/');
+  function handleLogin({password, email}, evt) {
+    authApi.signIn({password, email})
+    .then((data) => {
+      //console.log(data);
+      localStorage.setItem('token', data.token);
+      setLoggedIn(true);
+      navigate('/');
+      evt.target.reset();
+    })
+    .catch(console.error)
+  }
+
+  function handleRegister({password, email}, evt) {
+    authApi.signUp({password, email})
+    .then((data) => {
+      //console.log(data);
+      evt.target.reset();
+    })
+    .catch(console.error)
   }
 
   function handleSignOut() {
@@ -123,8 +150,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<ProtectedRoute element={Main} cards={cards} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick}
       onCardClick={handleCardClick} onCardLike={handleCardLike} onCardDelete={handleCardDelete} loggedIn={loggedIn}/>} />
-        <Route path="/signin" element={<Login onTrue={handleLoggedIn}/>} />
-        <Route path="/signup" element={<Register />} />
+        <Route path="/signin" element={<Login onLogin={handleLogin}/>} />
+        <Route path="/signup" element={<Register onRegister={handleRegister}/>} />
       </Routes>
       <Footer/>
     </CurrentUserContext.Provider>
