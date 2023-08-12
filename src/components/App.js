@@ -42,7 +42,7 @@ export default function App() {
     const token = localStorage.getItem('token');
     authApi.checkToken(token)
     .then(({data}) => {
-      //console.log(data);
+      console.log(data);
       setEmail(data.email);
     })
     .catch(console.error)
@@ -115,7 +115,7 @@ export default function App() {
   function handleLogin({password, email}, evt) {
     authApi.signIn({password, email})
     .then((data) => {
-      //console.log(data);
+      console.log(data);
       localStorage.setItem('token', data.token);
       setLoggedIn(true);
       navigate('/');
@@ -127,7 +127,7 @@ export default function App() {
   function handleRegister({password, email}, evt) {
     authApi.signUp({password, email})
     .then((data) => {
-      //console.log(data);
+      console.log(data);
       evt.target.reset();
     })
     .catch(console.error)
@@ -148,7 +148,7 @@ export default function App() {
       <PopupWithForm title="Вы уверены?" name="confirmation" button="Да"/>
       <Header loggedIn={loggedIn} email={email} onSignOut={handleSignOut}/>
       <Routes>
-        <Route path="/" element={<ProtectedRoute element={Main} cards={cards} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick}
+        <Route path="*" element={<ProtectedRoute element={Main} cards={cards} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick}
       onCardClick={handleCardClick} onCardLike={handleCardLike} onCardDelete={handleCardDelete} loggedIn={loggedIn}/>} />
         <Route path="/signin" element={<Login onLogin={handleLogin}/>} />
         <Route path="/signup" element={<Register onRegister={handleRegister}/>} />
