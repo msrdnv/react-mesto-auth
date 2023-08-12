@@ -1,4 +1,5 @@
 import React from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import Header from './Header.js';
 import Main from './Main.js';
 import Footer from './Footer.js';
@@ -7,6 +8,9 @@ import PopupWithForm from './PopupWithForm.js'
 import EditAvatarPopup from './EditAvatarPopup.js';
 import EditProfilePopup from './EditProfilePopup.js';
 import AddPlacePopup from './AddPlacePopup.js';
+import Login from './Login.js';
+import Register from './Register.js';
+import ProtectedRoute from './ProtectedRoute.js';
 import { api } from '../utils/api.js';
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
 
@@ -19,6 +23,10 @@ export default function App() {
 
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
+
+  const [loggedIn, setLoggedIn] = React.useState(false);
+  const [email, setEmail] = React.useState('email@mail.com');
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     Promise.all([api.getUserData(), api.getCards()])
@@ -93,6 +101,17 @@ export default function App() {
     .catch(console.error)
   }
 
+  function handleLoggedIn() {
+    setLoggedIn(true);
+    navigate('/');
+  }
+
+  function handleSignOut() {
+    if (loggedIn) {
+      setLoggedIn(false);
+    }
+  }
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
@@ -100,9 +119,13 @@ export default function App() {
       <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
       <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
       <PopupWithForm title="Вы уверены?" name="confirmation" button="Да"/>
-      <Header/>
-      <Main cards={cards} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick}
-      onCardClick={handleCardClick} onCardLike={handleCardLike} onCardDelete={handleCardDelete}/>
+      <Header loggedIn={loggedIn} email={email} onSignOut={handleSignOut}/>
+      <Routes>
+        <Route path="/" element={<ProtectedRoute element={Main} cards={cards} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick}
+      onCardClick={handleCardClick} onCardLike={handleCardLike} onCardDelete={handleCardDelete} loggedIn={loggedIn}/>} />
+        <Route path="/signin" element={<Login onTrue={handleLoggedIn}/>} />
+        <Route path="/signup" element={<Register />} />
+      </Routes>
       <Footer/>
     </CurrentUserContext.Provider>
   );
