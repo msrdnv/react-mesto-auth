@@ -24,7 +24,7 @@ export default function App() {
   const [selectedCard, setSelectedCard] = React.useState({src: "./", isOpen: false});
 
   const [isInfoTooltipOpen, setInfoTooltipOpen] = React.useState(false);
-  const [isSuccessful, setIsSuccessful] = React.useState(false);
+  const [isSuccessfulRegister, setSuccessfulRegister] = React.useState(false);
 
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
@@ -47,6 +47,8 @@ export default function App() {
     authApi.checkToken(token)
     .then(({data}) => {
       setEmail(data.email);
+      setLoggedIn(true);
+      navigate('/');
     })
     .catch(console.error)
   }, [loggedIn]);
@@ -133,11 +135,11 @@ export default function App() {
   function handleRegister({password, email}) {
     authApi.signUp({password, email})
     .then(() => {
-      setIsSuccessful(true);
+      setSuccessfulRegister(true);
       handleInfoTooltipOpen();
     })
     .catch(() => {
-      setIsSuccessful(false);
+      setSuccessfulRegister(false);
       handleInfoTooltipOpen();
     })
     .catch(console.error)
@@ -146,6 +148,7 @@ export default function App() {
   function handleSignOut() {
     if (loggedIn) {
       setLoggedIn(false);
+      localStorage.removeItem('token');
     }
   }
 
@@ -155,7 +158,7 @@ export default function App() {
       <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
       <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
       <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
-      <InfoTooltip isSuccessful={isSuccessful} isOpen={isInfoTooltipOpen} onClose={closeAllPopups}/>
+      <InfoTooltip isSuccessful={isSuccessfulRegister} isOpen={isInfoTooltipOpen} onClose={closeAllPopups}/>
       <PopupWithForm title="Вы уверены?" name="confirmation" button="Да"/>
       <Header loggedIn={loggedIn} email={email} onSignOut={handleSignOut}/>
       <Routes>

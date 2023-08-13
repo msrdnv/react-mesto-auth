@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(document.querySelector('.page'));
 root.render(
-  <BrowserRouter>
+  <BrowserRouter> {/*basename="/react-mesto-auth"*/}
     <App />
   </BrowserRouter>
 );
