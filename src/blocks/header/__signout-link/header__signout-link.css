@@ -1,5 +1,5 @@
 .header__signout-link {
-  display: none;
+  display: block;
   margin: 7px 0 0 0;
   padding: 0;
   text-decoration: none;
@@ -8,6 +8,12 @@
   font-size: 18px;
   font-weight: 400;
   line-height: 22px;
+}
+
+@media screen and (max-width: 635px) {
+  .header__signout-link {
+    display: none;
+  }
 }
 
 .header__signout-link:hover {

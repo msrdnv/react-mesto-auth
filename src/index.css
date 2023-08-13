@@ -2,6 +2,7 @@
 
 @import url(./fonts/inter.css);
 
+@import url(./blocks/html/html.css);
 @import url(./blocks/page/page.css);
 
 @import url(./blocks/auth-page/auth-page.css);
@@ -35,14 +36,21 @@
 @import url(./blocks/popup/__info-text/popup__info-text.css);
 
 @import url(./blocks/header/header.css);
+@import url(./blocks/header/_mobile/header_mobile.css);
 @import url(./blocks/header/__logo/header__logo.css);
 @import url(./blocks/header/__nav-container/header__nav-container.css);
-@import url(./blocks/header/__caption/header__caption.css);
-@import url(./blocks/header/__caption/_status-logged/header__caption_status-logged.css);
+@import url(./blocks/header/__nav-container/_mobile/header__nav-container_mobile.css);
+@import url(./blocks/header/__email-info/header__email-info.css);
+@import url(./blocks/header/__email-info/_disabled/header__email-info_disabled.css);
+@import url(./blocks/header/__email-info/_mobile/header__email-info_mobile.css);
 @import url(./blocks/header/__nav-link/header__nav-link.css);
-@import url(./blocks/header/__nav-link/_logged/header__nav-link_logged.css);
+@import url(./blocks/header/__nav-link/_disabled/header__nav-link_disabled.css);
+@import url(./blocks/header/__nav-menu-icon/header__nav-menu-icon.css);
+@import url(./blocks/header/__nav-menu-icon/_toggled/header__nav-menu-icon_toggled.css);
+@import url(./blocks/header/__nav-menu-icon/_disabled/header__nav-menu-icon_disabled.css);
 @import url(./blocks/header/__signout-link/header__signout-link.css);
-@import url(./blocks/header/__signout-link/_logged/header__signout-link_logged.css);
+@import url(./blocks/header/__signout-link/_disabled/header__signout-link_disabled.css);
+@import url(./blocks/header/__signout-link/_mobile/header__signout-link_mobile.css);
 
 @import url(./blocks/profile/profile.css);
 @import url(./blocks/profile/__info/profile__info.css);

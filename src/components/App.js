@@ -25,6 +25,7 @@ export default function App() {
 
   const [isInfoTooltipOpen, setInfoTooltipOpen] = React.useState(false);
   const [isSuccessfulRegister, setSuccessfulRegister] = React.useState(false);
+  const [isMobNavMenuActive, setMobNavMenuActive] = React.useState(false);
 
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
@@ -67,6 +68,10 @@ export default function App() {
 
   function handleInfoTooltipOpen() {
     setInfoTooltipOpen(true);
+  }
+
+  function toggleMobNavMenu() {
+    setMobNavMenuActive(!isMobNavMenuActive);
   }
 
   function closeAllPopups() {
@@ -148,6 +153,7 @@ export default function App() {
   function handleSignOut() {
     if (loggedIn) {
       setLoggedIn(false);
+      setMobNavMenuActive(false);
       localStorage.removeItem('token');
     }
   }
@@ -160,7 +166,7 @@ export default function App() {
       <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
       <InfoTooltip isSuccessful={isSuccessfulRegister} isOpen={isInfoTooltipOpen} onClose={closeAllPopups}/>
       <PopupWithForm title="Вы уверены?" name="confirmation" button="Да"/>
-      <Header loggedIn={loggedIn} email={email} onSignOut={handleSignOut}/>
+      <Header onClick={toggleMobNavMenu} isMenuActive={isMobNavMenuActive} loggedIn={loggedIn} email={email} onSignOut={handleSignOut}/>
       <Routes>
         <Route path="*" element={<ProtectedRoute element={Main} cards={cards} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick}
       onCardClick={handleCardClick} onCardLike={handleCardLike} onCardDelete={handleCardDelete} loggedIn={loggedIn}/>} />
