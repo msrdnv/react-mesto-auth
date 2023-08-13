@@ -8,6 +8,7 @@ import PopupWithForm from './PopupWithForm.js'
 import EditAvatarPopup from './EditAvatarPopup.js';
 import EditProfilePopup from './EditProfilePopup.js';
 import AddPlacePopup from './AddPlacePopup.js';
+import InfoTooltip from './InfoTooltip.js';
 import Login from './Login.js';
 import Register from './Register.js';
 import ProtectedRoute from './ProtectedRoute.js';
@@ -21,6 +22,9 @@ export default function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({src: "./", isOpen: false});
+
+  const [isInfoTooltipOpen, setInfoTooltipOpen] = React.useState(false);
+  const [isSuccessful, setIsSuccessful] = React.useState(false);
 
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
@@ -42,7 +46,6 @@ export default function App() {
     const token = localStorage.getItem('token');
     authApi.checkToken(token)
     .then(({data}) => {
-      console.log(data);
       setEmail(data.email);
     })
     .catch(console.error)
@@ -60,10 +63,15 @@ export default function App() {
     setAddPlacePopupOpen(true);
   }
 
+  function handleInfoTooltipOpen() {
+    setInfoTooltipOpen(true);
+  }
+
   function closeAllPopups() {
     setEditAvatarPopupOpen(false);
     setEditProfilePopupOpen(false);
     setAddPlacePopupOpen(false);
+    setInfoTooltipOpen(false);
     setSelectedCard({src: "./", isOpen: false});
   }
 
@@ -112,23 +120,25 @@ export default function App() {
     .catch(console.error)
   }
 
-  function handleLogin({password, email}, evt) {
+  function handleLogin({password, email}) {
     authApi.signIn({password, email})
     .then((data) => {
-      console.log(data);
       localStorage.setItem('token', data.token);
       setLoggedIn(true);
       navigate('/');
-      evt.target.reset();
     })
     .catch(console.error)
   }
 
-  function handleRegister({password, email}, evt) {
+  function handleRegister({password, email}) {
     authApi.signUp({password, email})
-    .then((data) => {
-      console.log(data);
-      evt.target.reset();
+    .then(() => {
+      setIsSuccessful(true);
+      handleInfoTooltipOpen();
+    })
+    .catch(() => {
+      setIsSuccessful(false);
+      handleInfoTooltipOpen();
     })
     .catch(console.error)
   }
@@ -145,6 +155,7 @@ export default function App() {
       <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
       <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
       <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
+      <InfoTooltip isSuccessful={isSuccessful} isOpen={isInfoTooltipOpen} onClose={closeAllPopups}/>
       <PopupWithForm title="Вы уверены?" name="confirmation" button="Да"/>
       <Header loggedIn={loggedIn} email={email} onSignOut={handleSignOut}/>
       <Routes>

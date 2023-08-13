@@ -18,7 +18,7 @@ export default function Login({onLogin}) {
     onLogin({
       password: password,
       email: email,
-    }, evt)
+    });
   }
 
   return (

@@ -19,7 +19,7 @@ export default function Register({onRegister}) {
     onRegister({
       password: password,
       email: email,
-    }, evt)
+    });
   }
 
   return (
