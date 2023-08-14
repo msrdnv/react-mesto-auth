@@ -1,5 +1,5 @@
 @media screen and (max-width: 635px) {
-  .header__nav-container_mobile {
+  .header__nav-container_mobile-menu-activated {
     position: absolute;
     top: 40px;
     left: 0;

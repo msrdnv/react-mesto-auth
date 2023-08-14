@@ -52,7 +52,7 @@ export default function App() {
       navigate('/');
     })
     .catch(console.error)
-  }, [loggedIn]);
+  }, [loggedIn, navigate]);
 
   function handleEditAvatarClick() {
     setEditAvatarPopupOpen(true);
