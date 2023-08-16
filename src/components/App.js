@@ -14,6 +14,7 @@ import Register from './Register.js';
 import ProtectedRoute from './ProtectedRoute.js';
 import { api } from '../utils/api.js';
 import { authApi } from '../utils/auth.js';
+import { AppContext } from '../contexts/AppContext.js';
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
 
 export default function App() {
@@ -22,16 +23,19 @@ export default function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({src: "./", isOpen: false});
-
   const [isInfoTooltipOpen, setInfoTooltipOpen] = React.useState(false);
-  const [isSuccessfulRegister, setSuccessfulRegister] = React.useState(false);
+
+  const [isSuccessRegister, setSuccessRegister] = React.useState(false);
+  const [addPlaceInformer, toggleAddPlaceInformer] = React.useState(false);
   const [isMobNavMenuActive, setMobNavMenuActive] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([]);
 
   const [loggedIn, setLoggedIn] = React.useState(false);
   const [email, setEmail] = React.useState('email@mail.com');
+
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -99,32 +103,36 @@ export default function App() {
     .catch(console.error)
   }
 
+  function handleSubmit(request) {
+    setIsLoading(true);
+    request()
+      .then(closeAllPopups)
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
+  }
+
   function handleUpdateUser({name, about}) {
-    api.editUserData({name, about})
-    .then((userData) => {
-      setCurrentUser(userData);
-      closeAllPopups();
-    })
-    .catch(console.error)
+    function makeRequest() {
+      return api.editUserData({name, about}).then(setCurrentUser);
+    }
+    handleSubmit(makeRequest);
   }
 
   function handleUpdateAvatar({avatar}) {
-    api.editUserAvatar({avatar})
-    .then((userData) => {
-      setCurrentUser(userData);
-      closeAllPopups();
-    })
-    .catch(console.error)
+    function makeRequest() {
+      return api.editUserAvatar({avatar}).then(setCurrentUser);
+    }
+    handleSubmit(makeRequest);
   }
 
-  function handleAddPlaceSubmit({name, link}, evt) {
-    api.postNewCard({name, link})
-    .then((newCard) => {
-      setCards([newCard, ...cards]);
-      closeAllPopups();
-      evt.target.reset();
-    })
-    .catch(console.error)
+  function handleAddPlaceSubmit({name, link}) {
+    function makeRequest() {
+      return api.postNewCard({name, link}).then((newCard) => {
+        setCards([newCard, ...cards]);
+        toggleAddPlaceInformer(!addPlaceInformer);
+      })
+    }
+    handleSubmit(makeRequest);
   }
 
   function handleLogin({password, email}) {
@@ -139,15 +147,10 @@ export default function App() {
 
   function handleRegister({password, email}) {
     authApi.signUp({password, email})
-    .then(() => {
-      setSuccessfulRegister(true);
-      handleInfoTooltipOpen();
-    })
-    .catch(() => {
-      setSuccessfulRegister(false);
-      handleInfoTooltipOpen();
-    })
+    .then(() => setSuccessRegister(true))
+    .catch(() => setSuccessRegister(false))
     .catch(console.error)
+    .finally(() => handleInfoTooltipOpen())
   }
 
   function handleSignOut() {
@@ -159,22 +162,24 @@ export default function App() {
   }
 
   return (
-    <CurrentUserContext.Provider value={currentUser}>
-      <ImagePopup card={selectedCard} onClose={closeAllPopups}/>
-      <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar}/>
-      <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser}/>
-      <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit}/>
-      <InfoTooltip isSuccessful={isSuccessfulRegister} isOpen={isInfoTooltipOpen} onClose={closeAllPopups}/>
-      <PopupWithForm title="Вы уверены?" name="confirmation" button="Да"/>
-      <Header onClick={toggleMobNavMenu} isMenuActive={isMobNavMenuActive} loggedIn={loggedIn} email={email} onSignOut={handleSignOut}/>
-      <Routes>
-        <Route path="*" element={<ProtectedRoute element={Main} cards={cards} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick}
-      onCardClick={handleCardClick} onCardLike={handleCardLike} onCardDelete={handleCardDelete} loggedIn={loggedIn}/>} />
-        <Route path="/signin" element={<Login onLogin={handleLogin}/>} />
-        <Route path="/signup" element={<Register onRegister={handleRegister}/>} />
-      </Routes>
-      <Footer/>
-    </CurrentUserContext.Provider>
+    <AppContext.Provider value={{isLoading, closeAllPopups}}>
+      <CurrentUserContext.Provider value={currentUser}>
+        <ImagePopup card={selectedCard}/>
+        <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onUpdateAvatar={handleUpdateAvatar}/>
+        <EditProfilePopup isOpen={isEditProfilePopupOpen} onUpdateUser={handleUpdateUser}/>
+        <AddPlacePopup isAdd={addPlaceInformer} isOpen={isAddPlacePopupOpen} onAddPlace={handleAddPlaceSubmit}/>
+        <InfoTooltip isSuccess={isSuccessRegister} isOpen={isInfoTooltipOpen}/>
+        <PopupWithForm title="Вы уверены?" name="confirmation" button="Да"/>
+        <Header onClick={toggleMobNavMenu} isMenuActive={isMobNavMenuActive} loggedIn={loggedIn} email={email} onSignOut={handleSignOut}/>
+        <Routes>
+          <Route path="*" element={<ProtectedRoute element={Main} cards={cards} onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick}
+          onAddPlace={handleAddPlaceClick} onCardClick={handleCardClick} onCardLike={handleCardLike} onCardDelete={handleCardDelete} loggedIn={loggedIn}/>} />
+          <Route path="/signin" element={<Login onLogin={handleLogin}/>} />
+          <Route path="/signup" element={<Register onRegister={handleRegister}/>} />
+        </Routes>
+        <Footer/>
+      </CurrentUserContext.Provider>
+    </AppContext.Provider>
   );
 }
 
